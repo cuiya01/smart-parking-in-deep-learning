@@ -1,0 +1,194 @@
+# -*- coding: utf-8 -*-
+"""
+@File    : yolo_annotation_clean.py
+@Time    : 2020/5/13 15:29
+@Author  : Dontla
+@Email   : sxana@qq.com
+@Software: PyCharm
+"""
+import os
+import re
+import shutil
+
+import cv2
+import random
+
+
+# sort function to sort the list of files (filenames is a list of strings for the filenames of the folder files, pattern is a regular expression, which is of type string)
+def sort_filenames(filenames, pattern):
+    # （You can sort by len, and strings with the same len will then be sorted by 0-9 to get the result we want
+    # filenames.sort(key=len)
+
+    # （2）This sorting fails
+    # filenames.sort(key=lambda x: x[16:])
+    # print(filenames[0][16:])
+    # 1).txt
+
+    # （3）Use lambda with regular expressions (take the objects out of filenames one by one and assign them to x. Return the result to key by using the expression after the colon)
+    # The number strings seem to be sorted by character order rather than number size, and may need to be converted to numbers first (and re.findall('\((. *?) \)', x) returns a list of strings to be converted into a list of numbers)
+
+Translated with www.DeepL.com/Translator (free version)
+    filenames.sort(key=lambda x: list(map(eval, re.findall(pattern, x))))
+
+
+def extract_content(content_):
+    # The first one was used at the beginning, and as a result only one line was not extracted, to remove the \n after it, keep in mind
+    # content_extract = re.findall('(.*?) (.*?) (.*?) (.*?) (.*?)\n', content)
+    # content_extract = re.findall('(.*?) (.*?) (.*?) (.*?) (.*?)', content)
+    content_extract_ = re.findall('(\d+.?\d*) (\d+.?\d*) (\d+.?\d*) (\d+.?\d*) (\d+.?\d*)', content_)
+    return content_extract_
+
+
+if __name__ == '__main__':
+    # Remember to add "/" to the end of the path, otherwise the join method will be called and it will replace it with "\", which is not good and can cause problems with escaped characters.
+    # ... / indicates the previous level of paths
+    # The following three paths are relative to the current file
+    source_img_path = './source_img/'
+    source_txt_path = './source_txt/'
+    target_txt_path = './target_txt/'
+
+    # Retrieve all files in the source_txt_path path (including files in subfolders)
+    filenames = os.listdir(source_txt_path)
+
+     # Call the custom sort_filenames function to reorder the filenames (if you don't reorder it looks like it will be in order 1, 10, 100...) instead of 1, 2, 3... )
+    # \ is an escape character
+    # pattern = '\((.*?)\)'
+    # Dontla 20200204 The file name is now a plain number, so the pattern has to be changed too
+    pattern = '(.*?).txt'
+    sort_filenames(filenames, pattern)
+
+    # print(filenames)
+    # ['1.txt', '2.txt', '3.txt', '4.txt', '5.txt', '6.txt', '7.txt', '8.txt', '9.txt', '10.txt']
+
+    # Open the file to extract the numbers and reconstruct the contents into a new file
+    for filename in filenames:
+        # Open the file ：
+        with open(os.path.join(source_txt_path, filename), 'r', encoding='utf-8') as f:
+            # 读取文本文件全部内容
+            content = f.read()
+
+            # 提取数据
+            content_extract = extract_content(content)
+
+            # print(content_extract)
+            # [('0', '0.631250', '0.270833', '0.156250', '0.277778'), ('0', '0.372656', '0.861111', '0.156250', '0.277778'), ('0', '0.448437', '0.447222', '0.156250', '0.277778'), ('0', '0.837500', '0.637500', '0.156250', '0.277778'), ('0', '0.155469', '0.268056', '0.156250', '0.277778')]
+            # ...
+
+            # 获取当前图片分辨率信息（这样不论图片尺寸多少都能成功转换）（re.findall()返回的是列表，需要将它转换成字符串）
+            # 读取图片
+            img = cv2.imread('{}{}.jpg'.format(source_img_path, ''.join(re.findall('(.*?).txt', filename))))
+
+            # 获取图片分辨率
+            img_width = img.shape[1]
+            img_height = img.shape[0]
+            # print(img_height, img_width)    # 720 1280
+
+            # 创建写入内容变量
+            write_content = ''
+
+            # 读取标注框数据
+            for box_tuple in content_extract:
+                # 将元组字符串转换成列表数字
+                box_evar = list(map(eval, box_tuple))
+                # print(box_evar)
+                # [0, 0.63125, 0.270833, 0.15625, 0.277778]
+                # ...
+
+                # 映射变量
+                class_id = box_evar[0]
+
+                x, y = box_evar[1] * img_width, box_evar[2] * img_height
+
+                w, h = box_evar[3] * img_width, box_evar[4] * img_height
+
+                # print(class_id, x, y, w, h)
+                # 0 808.0 194.99975999999998 200.0 200.00016000000002
+
+                # 【错误类筛选】
+                if class_id != 0:
+                    print('【类标注错误】：')
+                    print(filename)
+                    print(box_evar)
+                    print('[{}, {}, {}, {}, {}]'.format(round(x - w / 2), round(y - h / 2), round(x + w / 2),
+                                                        round(y + h / 2), class_id))
+                    print('\n')
+                    continue
+
+                # 【中心点超出范围】    
+                elif x < 0 or x >= img_width or y < 0 or y >= img_height:
+                    print('【标注框中心点超出图片范围】：')
+                    print(filename)
+                    print(box_evar)
+                    print('[{}, {}, {}, {}, {}]'.format(round(x - w / 2), round(y - h / 2), round(x + w / 2),
+                                                        round(y + h / 2), class_id))
+                    print('\n')
+                    continue
+
+                # 【标注框顶点超出范围】
+                elif round(x - w / 2) < 0 \
+                        or round(x + w / 2) > img_width \
+                        or round(x - w / 2) >= round(x + w / 2) \
+                        or round(y - h / 2) < 0 \
+                        or round(y + h / 2) > img_height \
+                        or round(y - h / 2) >= round(y + h / 2):
+                    print('【标注框顶点超出范围】：')
+                    print(filename)
+                    print(box_evar)
+                    print('[{}, {}, {}, {}, {}]'.format(round(x - w / 2), round(y - h / 2), round(x + w / 2),
+                                                        round(y + h / 2), class_id))
+                    print('\n')
+                    continue
+
+                # 【框的长宽差太多】
+                elif w / h > 2 or h / w > 2:
+                    print('【框的长宽比不合适】：')
+                    print(filename)
+                    print(box_evar)
+                    print('[{}, {}, {}, {}, {}]'.format(round(x - w / 2), round(y - h / 2), round(x + w / 2),
+                                                        round(y + h / 2), class_id))
+                    print('\n')
+                    continue
+
+                # 【不是方形框】
+                # elif w / h < 0.99:
+                #     print('【不是方形框】：')
+                #     print(filename)
+                #     print(box_evar)
+                #     print('[{}, {}, {}, {}, {}]'.format(round(x - w / 2), round(y - h / 2), round(x + w / 2),
+                #                                         round(y + h / 2), class_id))
+                #     print('\n')
+                #     continue
+
+                # 【框太小或太大（边长小于80或大于300）】
+                elif w < 80 or w > 300 or h < 80 or h > 300:
+                    print('【标注框大小有问题】：')
+                    print(filename)
+                    print(box_evar)
+                    print('[{}, {}, {}, {}, {}]'.format(round(x - w / 2), round(y - h / 2), round(x + w / 2),
+                                                        round(y + h / 2), class_id))
+                    print('\n')
+                    continue
+
+                # 将筛选后的标注框加入到write_content中：
+                write_content += '{} {} {} {} {}\n'.format(box_evar[0], box_evar[1], box_evar[2], box_evar[3],
+                                                           box_evar[4])
+            # print(filename)
+            # print(write_content)
+
+            # 【去除空文件】
+            # if write_content == '':
+            #     print('空文件：{}'.format(filename))
+            #     # print('content：{}'.format(content))
+            #     cv2.imwrite('null_img\\{}.jpg'.format(''.join(re.findall('(.*?).txt', filename))), img)
+            #     print('将图片拷贝到“空文件”文件夹')
+            #     continue
+            # else:
+            #     write_content = write_content.strip()
+            #     with open(os.path.join(target_txt_path, filename), 'w', encoding='utf-8') as f2:
+            #         f2.write(write_content)
+
+            # 【不去除空文件】
+            write_content = write_content.strip()
+            with open(os.path.join(target_txt_path, filename), 'w', encoding='utf-8') as f2:
+                f2.write(write_content)
+
