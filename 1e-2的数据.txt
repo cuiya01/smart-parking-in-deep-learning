@@ -1,0 +1,61 @@
+     Epoch   gpu_mem      GIoU       obj       cls     total   targets  img_size
+  0% 0/544 [00:00<?, ?it/s]/usr/local/lib/python3.7/dist-packages/torch/functional.py:568: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at  ../aten/src/ATen/native/TensorShape.cpp:2228.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+/usr/local/lib/python3.7/dist-packages/torch/cuda/memory.py:386: FutureWarning: torch.cuda.memory_cached has been renamed to torch.cuda.memory_reserved
+  FutureWarning)
+       0/9     8.06G     0.746      4.15     0.498      5.39       374       416: 100% 544/544 [07:07<00:00,  1.27it/s]
+               Class    Images   Targets         P         R   mAP@0.5        F1: 100% 78/78 [03:16<00:00,  2.52s/it]
+                 all  2.48e+03  1.43e+05     0.687     0.978      0.92     0.806
+
+     Epoch   gpu_mem      GIoU       obj       cls     total   targets  img_size
+  0% 0/544 [00:00<?, ?it/s]/usr/local/lib/python3.7/dist-packages/torch/cuda/memory.py:386: FutureWarning: torch.cuda.memory_cached has been renamed to torch.cuda.memory_reserved
+  FutureWarning)
+       1/9     8.93G     0.576      2.09     0.173      2.84       360       416: 100% 544/544 [07:07<00:00,  1.27it/s]
+               Class    Images   Targets         P         R   mAP@0.5        F1: 100% 78/78 [03:12<00:00,  2.46s/it]
+                 all  2.48e+03  1.43e+05     0.819      0.98     0.949     0.892
+
+     Epoch   gpu_mem      GIoU       obj       cls     total   targets  img_size
+       2/9     8.93G      0.53      1.59     0.147      2.26       437       416: 100% 544/544 [07:02<00:00,  1.29it/s]
+               Class    Images   Targets         P         R   mAP@0.5        F1: 100% 78/78 [03:10<00:00,  2.44s/it]
+                 all  2.48e+03  1.43e+05     0.833     0.991     0.964     0.905
+
+Model Bias Summary:    layer        regression        objectness    classification
+                          89      -0.24+/-0.30      -3.32+/-1.32      -6.58+/-0.91 
+                         101      -0.02+/-0.25      -2.85+/-0.18      -6.33+/-0.70 
+                         113       0.06+/-0.34      -3.33+/-0.59      -6.03+/-0.75 
+
+     Epoch   gpu_mem      GIoU       obj       cls     total   targets  img_size
+       3/9     8.93G     0.377      2.22      0.12      2.71       282       416: 100% 544/544 [07:02<00:00,  1.29it/s]
+               Class    Images   Targets         P         R   mAP@0.5        F1: 100% 78/78 [03:06<00:00,  2.39s/it]
+                 all  2.48e+03  1.43e+05      0.88     0.983     0.984     0.927
+
+     Epoch   gpu_mem      GIoU       obj       cls     total   targets  img_size
+       4/9     8.93G     0.348      2.05    0.0962      2.49       304       416: 100% 544/544 [07:02<00:00,  1.29it/s]
+               Class    Images   Targets         P         R   mAP@0.5        F1: 100% 78/78 [03:06<00:00,  2.39s/it]
+                 all  2.48e+03  1.43e+05     0.914     0.996     0.988     0.953
+
+     Epoch   gpu_mem      GIoU       obj       cls     total   targets  img_size
+       5/9     8.93G     0.324      1.94    0.0813      2.34       277       416: 100% 544/544 [07:02<00:00,  1.29it/s]
+               Class    Images   Targets         P         R   mAP@0.5        F1: 100% 78/78 [03:07<00:00,  2.40s/it]
+                 all  2.48e+03  1.43e+05     0.935     0.997     0.991     0.965
+
+     Epoch   gpu_mem      GIoU       obj       cls     total   targets  img_size
+       6/9     8.93G     0.306      1.88    0.0701      2.25       251       416: 100% 544/544 [07:03<00:00,  1.28it/s]
+               Class    Images   Targets         P         R   mAP@0.5        F1: 100% 78/78 [03:08<00:00,  2.41s/it]
+                 all  2.48e+03  1.43e+05     0.934     0.996     0.991     0.964
+
+     Epoch   gpu_mem      GIoU       obj       cls     total   targets  img_size
+       7/9     8.93G     0.292      1.83    0.0656      2.19       266       416: 100% 544/544 [07:02<00:00,  1.29it/s]
+               Class    Images   Targets         P         R   mAP@0.5        F1: 100% 78/78 [03:07<00:00,  2.40s/it]
+                 all  2.48e+03  1.43e+05      0.95     0.998     0.993     0.973
+
+     Epoch   gpu_mem      GIoU       obj       cls     total   targets  img_size
+       8/9     8.93G     0.284      1.81    0.0596      2.15       124       416: 100% 544/544 [07:02<00:00,  1.29it/s]
+               Class    Images   Targets         P         R   mAP@0.5        F1: 100% 78/78 [03:06<00:00,  2.39s/it]
+                 all  2.48e+03  1.43e+05     0.952     0.997     0.992     0.974
+
+     Epoch   gpu_mem      GIoU       obj       cls     total   targets  img_size
+       9/9     8.93G     0.281      1.79    0.0575      2.13       235       416: 100% 544/544 [07:02<00:00,  1.29it/s]
+               Class    Images   Targets         P         R   mAP@0.5        F1: 100% 78/78 [03:06<00:00,  2.39s/it]
+                 all  2.48e+03  1.43e+05     0.954     0.998     0.993     0.975
+10 epochs completed in 1.711 hours.
